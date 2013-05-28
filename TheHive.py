@@ -7,3 +7,4 @@ import TheHive
 
 W = TheHive.World()
 print W
+print W.hexmap[(0,0,0)]

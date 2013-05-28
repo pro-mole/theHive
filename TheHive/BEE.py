@@ -13,6 +13,9 @@ class BEE:
     hunger = 0
     '''Energy'''
     energy = 1000
+    
+    '''State: what is this BEE doing now?'''
+    state = "IDLE"
 
     '''Create a BEE at position (H,I,J), associated with world W'''
     def __init__(self,h,i,j,W):
