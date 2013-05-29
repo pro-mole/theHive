@@ -139,7 +139,9 @@ class World:
     def addHex(self,h,i,j):
         if not self.hexmap.has_key((h,i,j)):
             random.seed(hiveRand.getSeedForHex((h,i,j)))
-            if random.random() < 0.01:
+            chance = random.random()
+            #Flowers on a 1% chance
+            if chance < 0.01:
                 self.hexmap[(h,i,j)] = Hex('Flower')
                 self.hexmap[(h,i,j)].changeLiquids('Honey',int(random.random() * 20))
                 self.hexmap[(h,i,j)].changePowders('Pollen',int(random.random() * 50))
@@ -151,7 +153,7 @@ class World:
                     self.getHex(h,i-d,j).changeSmell('Flower', math.pow(2,-d))
                     self.getHex(h,i,j+d).changeSmell('Flower', math.pow(2,-d))
                     self.getHex(h,i,j-d).changeSmell('Flower', math.pow(2,-d))
-                    
+            #Everything else is just plain ol' dirt   
             else:
                 self.hexmap[(h,i,j)] = Hex('Dirt')
         return self.hexmap[(h,i,j)]
