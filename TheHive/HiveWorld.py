@@ -1,7 +1,7 @@
 '''World module
 codified how the world that this game happens in works'''
 
-from BEE import *
+from BEE import BEE
 import hiveRand
 import random
 import math
@@ -62,25 +62,25 @@ class Hex:
     
     '''Adds solids to this Hex
     Solids cannot be smaller than 0'''
-    def changeLiquid(self, solid, quantity):
-        if self.solids.has_key(liq):
+    def changeSolid(self, solid, quantity):
+        if self.solids.has_key(solid):
             self.solids[solid] += quantity
         else:
             self.solids[solid] = quantity
         
         if self.solids[solid] < 0:
-                self.solids.pop(liq)
+                self.solids.pop(solid)
     
     '''Adds powder to this Hex
     Powders cannot be smaller than 0'''
-    def changeLiquid(self, powder, weight):
-        if self.powders.has_key(liq):
+    def changePowder(self, powder, weight):
+        if self.powders.has_key(powder):
             self.powders[powder] += weight
         else:
             self.powders[powder] = weight
         
         if self.powders[powder] < 0:
-                self.powders.pop(liq)
+                self.powders.pop(powder)
 
 class World:
 
@@ -101,6 +101,12 @@ class World:
         #No data; start over
         if len(data) == 0:
             self.hexmap[(0,0,0)] = Hex('Hive')
+            self.hexmap[(0,0,1)] = Hex('Hive')
+            self.hexmap[(0,0,-1)] = Hex('Hive')
+            self.hexmap[(0,1,0)] = Hex('Hive')
+            self.hexmap[(0,-1,0)] = Hex('Hive')
+            self.hexmap[(1,0,0)] = Hex('Hive')
+            self.hexmap[(-1,0,0)] = Hex('Hive')
             initrange = 2
             for h in range(-initrange,initrange+1):
                 for i in range(-initrange,initrange+1):
@@ -108,8 +114,15 @@ class World:
                         self.addHex(h,i,j)
             
             B = BEE(0,0,0,self)
+            B.setFunction("QUEEN")
             self.bees.append(B)
             self.entities.append(B)
+            for i in range(3):
+                _p = [0,0,0]
+                _p[i] = 1
+                B = BEE(_p[0], _p[1], _p[2], self)
+                self.bees.append(B)
+                self.entities.append(B)
         
         hiveRand.seed = self.SEED    
             
