@@ -70,4 +70,7 @@ def normalHex(h,i,j):
             _i += delta
             _j -= delta 
     
-    return _h,_i,_j
+    if (h,i,j) != (_h,_i,_j):
+        return normalHex(_h,_i,_j)
+    else: 
+        return _h,_i,_j

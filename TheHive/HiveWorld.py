@@ -1,7 +1,7 @@
 '''World module
 codified how the world that this game happens in works'''
 
-has_pygame = False
+has_pygame = True
 
 from BEE import BEE
 from HiveMath import *
@@ -98,8 +98,7 @@ class World:
     
     '''The Hex Map is a map of hex data list(smells, liquids, solids, terrain) to (H,I,J) positions'''
     hexmap = {}
-    '''The Rect Map is a map of hex data list(smells, liquids, solids, terrain) to (X,Y) positions'''
-    rectmap = {} 
+    normalhexmap = {} #For when we need just the bare necessities
     
     '''BEEs. We'll keep them all together for easy of use'''
     bees = []
@@ -120,7 +119,7 @@ class World:
             for (i,j,k) in ((0,0,1),(0,1,0),(1,0,0),(-1,0,0),(0,-1,0),(0,0,-1),(0,0,0)):
                         H = self.addHex(i, j, k, type="Hive")
                         self.hiveHex.append(H)
-            initrange = 1
+            initrange = 5
             for h in range(-initrange,initrange+1):
                 for i in range(-initrange,initrange+1):
                     for j in range(-initrange,initrange+1):
@@ -144,8 +143,8 @@ class World:
     def __repr__(self):
         R = ""
         R += "TheHive World Object\n"
-        R += "Loaded hexes: {0}\n".format(len(self.hexmap))
-        for H in self.hexmap:
+        R += "Loaded hexes: {0}\n".format(len(self.normalhexmap))
+        for H in self.normalhexmap:
             R += "\t{0}\t{1}\n".format(H,self.hexmap[H])
         R += "\nBEEs: \n"
         for B in self.bees:
@@ -167,18 +166,18 @@ class World:
     def addHex(self,h,i,j,**hexdata):
         if not self.hexmap.has_key((h,i,j)):
             _h,_i,_j = normalHex(h,i,j)
-            if not self.hexmap.has_key((_h,_i,_j)):
+            if not self.normalhexmap.has_key((_h,_i,_j)):
                 random.seed(hiveRand.getSeedForHex((_h,_i,_j)))
                 if hexdata.has_key('type'):
-                    self.hexmap[(_h,_i,_j)] = Hex(hexdata['type'])
+                    self.normalhexmap[(_h,_i,_j)] = Hex(hexdata['type'])
                 else:
                     chance = random.random()
                     #Flowers on a 1% chance
-                    if chance < 0.1:
-                        self.hexmap[(_h,_i,_j)] = Hex('Flower')
-                        self.hexmap[(_h,_i,_j)].changeLiquid('Honey',int(random.random() * 20))
-                        self.hexmap[(_h,_i,_j)].changePowder('Pollen',int(random.random() * 50))
-                        self.hexmap[(_h,_i,_j)].changeSmell('Flower',1)
+                    if chance < 0.01:
+                        self.normalhexmap[(_h,_i,_j)] = Hex('Flower')
+                        self.normalhexmap[(_h,_i,_j)].changeLiquid('Honey',int(random.random() * 20))
+                        self.normalhexmap[(_h,_i,_j)].changePowder('Pollen',int(random.random() * 50))
+                        self.normalhexmap[(_h,_i,_j)].changeSmell('Flower',1)
 #                         for d in range(1,5):
 #                             self.getHex(_h+d,_i,_j).changeSmell('Flower', math.pow(2,-d))
 #                             self.getHex(_h-d,_i,_j).changeSmell('Flower', math.pow(2,-d))
@@ -188,11 +187,11 @@ class World:
 #                             self.getHex(_h,_i,_j-d).changeSmell('Flower', math.pow(2,-d))
                     #Everything else is just plain ol' dirt   
                     else:
-                        self.hexmap[(_h,_i,_j)] = Hex('Dirt')
+                        self.normalhexmap[(_h,_i,_j)] = Hex('Dirt')
+                self.hexmap[(_h,_i,_j)] = self.normalhexmap[(_h,_i,_j)]
             else:
                 print "Collided adding Hex {0} [{1}]".format((h,i,j),(_h,_i,_j))
             self.hexmap[(h,i,j)] = self.hexmap[(_h,_i,_j)]
-        _h,_i,_j = normalHex(h,i,j)
         return self.hexmap[(h,i,j)]
     
     def draw(self, surface):
