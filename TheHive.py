@@ -18,6 +18,8 @@ W = TheHive.World()
 #Loop
 gameQuit = False
 while not gameQuit: # main game loop
+    DISPLAYSURF.fill((0,0,0))
+    W.draw(DISPLAYSURF)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -26,3 +28,6 @@ while not gameQuit: # main game loop
 
 #Finish
 print W
+print W.hexmap[(0,0,0)]
+print W.hexmap[(-1,-1,1)]
+print W.hexmap[(1,1,-1)]
