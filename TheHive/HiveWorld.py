@@ -1,13 +1,16 @@
 '''World module
 codified how the world that this game happens in works'''
 
+has_pygame = False
+
 from BEE import BEE
 from HiveMath import *
 import hiveRand
 import random
 import math
-import pygame
-from pygame.locals import *
+if has_pygame:
+    import pygame
+    from pygame.locals import *
 
 class Hex:
     '''Terrain type(e.g. Hive, Dirt, Leaf, Flower, Water, Sand)'''
@@ -135,7 +138,8 @@ class World:
                 self.entities.append(B)
         
         hiveRand.seed = self.SEED
-        self.clock = pygame.time.Clock()
+        if has_pygame:
+            self.clock = pygame.time.Clock()
             
     def __repr__(self):
         R = ""

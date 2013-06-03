@@ -3,20 +3,23 @@
 
 Does initialization and game looping'''
 
+has_pygame = False
+
 import TheHive
 import sys
-import pygame
-from pygame.locals import *
+if has_pygame:
+    import pygame
+    from pygame.locals import *
 
-#Initialize
-pygame.init()
-DISPLAYSURF = pygame.display.set_mode((1024, 768))
-pygame.display.set_caption('The Hive v0.01')
+    #Initialize
+    pygame.init()
+    DISPLAYSURF = pygame.display.set_mode((1024, 768))
+    pygame.display.set_caption('The Hive v0.01')
 
 W = TheHive.World()
 
 #Loop
-gameQuit = False
+gameQuit = not has_pygame
 while not gameQuit: # main game loop
     DISPLAYSURF.fill((0,0,0))
     W.draw(DISPLAYSURF)

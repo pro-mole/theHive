@@ -4,7 +4,9 @@ Some functions and constants we'll be needing'''
 
 import math
 
-'''Get center XY coordinates for a Hex'''
+'''Get center XY coordinates for a Hex
+
+X,Y are normalized, i.e., are defined in term of tile width'''
 def getHexToXY(h,i,j):
     #H coordinate is just horizontal
     x = h
@@ -21,20 +23,51 @@ def getXYToHex(x,y):
     H = x
     I = (y - 2 *(x - H))/2.0
     J = y - I
-    return H,I,J
+    #Get the normalized hex
+    return normalHex(H,I,J)
 
 '''Normalize Hex coordinates'''
 def normalHex(h,i,j):
-    if (i < 0 and j > 0) or (i > 0 and j < 0):
-        _h = min(abs(i), abs(j))
-        if i < 0:
-            I = i + _h
-            J = j - _h
-            H = h + _h
-        else:
-            I = i - _h
-            J = j + _h
-            H = h - _h
-        return (H,I,J)
+    _h,_i,_j = h,i,j
+    if h == 0:
+        delta = min(abs(i), abs(j))
+        if i < 0 and j > 0:
+            _h += delta
+            _i += delta
+            _j -= delta
+        elif i > 0 and j < 0:
+            _h -= delta
+            _i -= delta
+            _j += delta
+    elif i == 0:
+        delta = min(abs(h), abs(j))
+        if h < 0 and j > 0:
+            _h += delta
+            _i += delta
+            _j -= delta
+        elif h > 0 and j < 0:
+            _h -= delta
+            _i -= delta
+            _j += delta
+    elif j == 0:
+        delta = min(abs(h),abs(i))
+        if h > 0 and i > 0:
+            _h -= delta
+            _i -= delta
+            _j += delta
+        elif h < 0 and i < 0:
+            _h += delta
+            _i += delta
+            _j -= delta
     else:
-        return (h,i,j)
+        delta = min(abs(i), abs(j))
+        if i > 0 and j < 0:
+            _h -= delta
+            _i -= delta
+            _j += delta
+        elif j > 0 and i < 0:
+            _h += delta
+            _i += delta
+            _j -= delta 
+    
+    return _h,_i,_j
