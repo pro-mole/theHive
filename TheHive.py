@@ -3,7 +3,7 @@
 
 Does initialization and game looping'''
 
-has_pygame = True
+has_pygame = False
 
 import TheHive
 import sys

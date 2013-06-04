@@ -1,7 +1,7 @@
 '''World module
 codified how the world that this game happens in works'''
 
-has_pygame = True
+has_pygame = False
 
 from BEE import BEE
 from HiveMath import *
@@ -129,9 +129,7 @@ class World:
             B.setFunction("QUEEN")
             self.bees.append(B)
             self.entities.append(B)
-            for i in range(3):
-                _p = [0,0,0]
-                _p[i] = 1
+            for i in [(1,0,0),(0,1,0),(0,0,-1)]:
                 B = BEE(_p[0], _p[1], _p[2], self)
                 self.bees.append(B)
                 self.entities.append(B)
