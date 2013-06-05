@@ -3,7 +3,7 @@
 
 Does initialization and game looping'''
 
-has_pygame = False
+has_pygame = True
 
 import TheHive
 import sys
@@ -22,12 +22,15 @@ W = TheHive.World()
 gameQuit = not has_pygame
 while not gameQuit: # main game loop
     DISPLAYSURF.fill((0,0,0))
+    W.update()
     W.draw(DISPLAYSURF)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             gameQuit = True
+    W.clock.tick(12)
+    print W.bees
 
 #Finish
 print W

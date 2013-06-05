@@ -1,13 +1,14 @@
 '''World module
 codified how the world that this game happens in works'''
 
-has_pygame = False
+has_pygame = True
 
 from BEE import BEE
 from HiveMath import *
 import hiveRand
 import random
 import math
+import operator
 if has_pygame:
     import pygame
     from pygame.locals import *
@@ -119,7 +120,7 @@ class World:
             for (i,j,k) in ((0,0,1),(0,1,0),(1,0,0),(-1,0,0),(0,-1,0),(0,0,-1),(0,0,0)):
                         H = self.addHex(i, j, k, type="Hive")
                         self.hiveHex.append(H)
-            initrange = 5
+            initrange = 1
             for h in range(-initrange,initrange+1):
                 for i in range(-initrange,initrange+1):
                     for j in range(-initrange,initrange+1):
@@ -129,7 +130,7 @@ class World:
             B.setFunction("QUEEN")
             self.bees.append(B)
             self.entities.append(B)
-            for i in [(1,0,0),(0,1,0),(0,0,-1)]:
+            for _p in [(1,0,0),(0,1,0),(0,0,-1)]:
                 B = BEE(_p[0], _p[1], _p[2], self)
                 self.bees.append(B)
                 self.entities.append(B)
@@ -226,3 +227,22 @@ class World:
             x,y = getHexToXY(h,i,j)
             pygame.draw.circle(surface, (255,144,128), (int(512 + 32*x),int(384 + 32*y)), 4)
             
+    def update(self):
+        for B in self.bees:
+            #Reveal the current hex
+            h,i,j = B.pos
+            _H = self.getHex(h, i, j)
+            if B.function == "WORKER":
+                if B.state == "IDLE": 
+                    if B.energy >= 500 and random.random() < 0.2:
+                        B.state = "ROAM"
+                    else:
+                        B.energy += 3
+                elif B.state == "ROAM":
+                    if B.energy >= 100:
+                        B.pos = tuple(map(operator.add, B.pos, random.choice([(0,0,1),(0,0,-1),(0,1,0),(0,-1,0),(1,0,0),(-1,0,0)])))
+                        B.energy -= 1
+                    else:
+                        B.state = "IDLE"
+            B.energy -= 1
+            B.hunger += 1
