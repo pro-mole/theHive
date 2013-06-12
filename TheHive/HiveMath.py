@@ -4,6 +4,10 @@ Some functions and constants we'll be needing'''
 
 import math
 
+'''Constants'''
+'''Unitary hex vectors'''
+vectorhex1 = [(0,0,1),(0,1,0),(1,0,0),(-1,0,0),(0,-1,0),(0,0,-1)]
+
 '''Get center XY coordinates for a Hex
 
 X,Y are normalized, i.e., are defined in term of tile width'''

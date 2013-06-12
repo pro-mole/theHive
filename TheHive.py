@@ -7,10 +7,13 @@ has_pygame = True
 
 import TheHive
 import sys
-if has_pygame:
+try:
     import pygame
     from pygame.locals import *
+except ImportError:
+    has_pygame = False
 
+if has_pygame:
     #Initialize
     pygame.init()
     DISPLAYSURF = pygame.display.set_mode((1024, 768))
@@ -33,7 +36,10 @@ while not gameQuit: # main game loop
     print W.bees
 
 #Finish
-print W
-print W.hexmap[(0,0,0)]
-print W.hexmap[(-1,-1,1)]
-print W.hexmap[(1,1,-1)]
+#print W
+print len(W.hexmap)
+print len(W.normalhexmap)
+print len(W.visiblehexmap)
+
+for B in W.bees:
+    print B.hexmap.keys()

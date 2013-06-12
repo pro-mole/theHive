@@ -9,9 +9,11 @@ import hiveRand
 import random
 import math
 import operator
-if has_pygame:
+try:
     import pygame
     from pygame.locals import *
+except ImportError:
+    has_pygame = False
 
 class Hex:
     '''Terrain type(e.g. Hive, Dirt, Leaf, Flower, Water, Sand)'''
@@ -99,7 +101,10 @@ class World:
     
     '''The Hex Map is a map of hex data list(smells, liquids, solids, terrain) to (H,I,J) positions'''
     hexmap = {}
-    normalhexmap = {} #For when we need just the bare necessities
+    '''The Normal Hex Map is a map of the minimum number of hexes we need to represent the map; the Hex Map will refer to this one'''
+    normalhexmap = {}
+    '''The visible Hex Map is a map of the hexes that the player knows about. This way, we generate the map in advance without spoiling it for the player :P '''
+    visiblehexmap = {}
     
     '''BEEs. We'll keep them all together for easy of use'''
     bees = []
@@ -120,7 +125,7 @@ class World:
             for (i,j,k) in ((0,0,1),(0,1,0),(1,0,0),(-1,0,0),(0,-1,0),(0,0,-1),(0,0,0)):
                         H = self.addHex(i, j, k, type="Hive")
                         self.hiveHex.append(H)
-            initrange = 1
+            initrange = 6
             for h in range(-initrange,initrange+1):
                 for i in range(-initrange,initrange+1):
                     for j in range(-initrange,initrange+1):
@@ -194,7 +199,7 @@ class World:
         return self.hexmap[(h,i,j)]
     
     def draw(self, surface):
-        for H in self.hexmap:
+        for H in self.visiblehexmap:
             h,i,j = H
             x,y = getHexToXY(h, i, j)
             hexdata = self.getHex(h, i, j)
@@ -223,9 +228,7 @@ class World:
                 tuple(hexV), 1)
             
         for B in self.bees:
-            h,i,j = B.pos
-            x,y = getHexToXY(h,i,j)
-            pygame.draw.circle(surface, (255,144,128), (int(512 + 32*x),int(384 + 32*y)), 4)
+            B.draw(surface)
             
     def update(self):
         for B in self.bees:
