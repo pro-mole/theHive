@@ -21,6 +21,14 @@ if has_pygame:
 
 W = TheHive.World()
 
+print TheHive.HiveMath.getHexToXY(0,2,8)
+print TheHive.HiveMath.normalHex(0,2,8)
+print -2, -3, -1
+print TheHive.HiveMath.getHexToXY(-2,-3,-1)
+print TheHive.HiveMath.normalHex(-2,-3,-1)
+
+#sys.exit(0)
+
 #Loop
 gameQuit = not has_pygame
 while not gameQuit: # main game loop
@@ -33,7 +41,9 @@ while not gameQuit: # main game loop
             pygame.quit()
             gameQuit = True
     W.clock.tick(12)
-    print W.bees
+    #print W.bees 
+    #Fs = [_H for _H in W.hexmap if W.hexmap[_H].terrain == 'Flower']
+    #print len(Fs)
 
 #Finish
 #print W

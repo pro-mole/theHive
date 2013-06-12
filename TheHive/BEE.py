@@ -62,12 +62,16 @@ class BEE:
         h,i,j = self.pos
         x,y = getHexToXY(h,i,j)
         
-        pygame.draw.circle(surface, (255,192,128), (x,y))
+        x = x*32 + 512
+        y = y*32 + 384
+        
+        pygame.draw.circle(surface, (255,192,128), (int(x),int(y)), 4)
         
     def update(self):
         #Reveal all hexes around yourself
         h,i,j = self.pos
         h,i,j = normalHex(h,i,j)
+        self.pos = h,i,j
         if not (h,i,j) in self.hexmap:
             self.hexmap[(h,i,j)] = self.world.getHex(h,i,j)
             self.world.visiblehexmap[(h,i,j)] = self.world.getHex(h,i,j)

@@ -30,10 +30,38 @@ def getXYToHex(x,y):
     #Get the normalized hex
     return normalHex(H,I,J)
 
+'''Normalization map
+To reduce computation costs(I hope)'''
+normalmap = {}
+
 '''Normalize Hex coordinates'''
 def normalHex(h,i,j):
+    if (h,i,j) in normalmap.keys():
+        return normalmap[(h,i,j)]
+    
     _h,_i,_j = h,i,j
-    if h == 0:
+    
+    if h != 0 and i != 0 and j != 0:
+        delta = min(abs(i), abs(j))
+        if i > 0:
+            if j < 0:
+                _h -= delta
+                _i -= delta
+                _j += delta
+            elif j > 0:
+                _h += delta
+                _i += delta
+                _j -= delta
+        elif i < 0:
+            if  j > 0:
+                _h += delta
+                _i += delta
+                _j -= delta
+            #elif j < 0:
+            #    _h += delta
+            #    _i -= delta
+            #    _j += delta
+    elif h == 0:
         delta = min(abs(i), abs(j))
         if i < 0 and j > 0:
             _h += delta
@@ -62,19 +90,13 @@ def normalHex(h,i,j):
         elif h < 0 and i < 0:
             _h += delta
             _i += delta
-            _j -= delta
-    else:
-        delta = min(abs(i), abs(j))
-        if i > 0 and j < 0:
-            _h -= delta
-            _i -= delta
-            _j += delta
-        elif j > 0 and i < 0:
-            _h += delta
-            _i += delta
             _j -= delta 
     
+    normalmap[(h,i,j)] = (_h,_i,_j)
+    
     if (h,i,j) != (_h,_i,_j):
-        return normalHex(_h,_i,_j)
+        __h, __i, __j = normalHex(_h,_i,_j)
+        normalmap[(h,i,j)] = (__h,__i,__j)
+        return __h,__i,__j
     else: 
         return _h,_i,_j

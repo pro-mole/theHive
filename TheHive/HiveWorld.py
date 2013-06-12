@@ -161,16 +161,24 @@ class World:
     
     '''Get hex in position H,I,J'''
     def getHex(self,h,i,j):
-        if self.hexmap.has_key(normalHex(h,i,j)):
-            return self.hexmap[normalHex(h,i,j)]
-        else:
-            return(self.addHex(h,i,j))
+        if (h,i,j) in self.hexmap.keys():
+            return self.hexmap[(h,i,j)]
+        else: 
+            _h,_i,_j = normalHex(h,i,j)
+            if (_h,_i,_j) in self.normalhexmap.keys():
+                return self.normalhexmap[(_h,_i,_j)]
+            else:
+                return(self.addHex(h,i,j))
     
     '''Add new hex in position H,I,J(taking in account randomizations)'''
     def addHex(self,h,i,j,**hexdata):
         if not self.hexmap.has_key((h,i,j)):
             _h,_i,_j = normalHex(h,i,j)
             if not self.normalhexmap.has_key((_h,_i,_j)):
+                if getHexToXY(_h,_i,_j) == getHexToXY(-2,0,10):
+                    print (h,i,j),(_h,_i,_j)
+                    print getHexToXY(_h,_i,_j)
+                    print "GOTCHA"
                 random.seed(hiveRand.getSeedForHex((_h,_i,_j)))
                 if hexdata.has_key('type'):
                     self.normalhexmap[(_h,_i,_j)] = Hex(hexdata['type'])
@@ -192,6 +200,7 @@ class World:
                     #Everything else is just plain ol' dirt   
                     else:
                         self.normalhexmap[(_h,_i,_j)] = Hex('Dirt')
+                        print "New Hex at {0} -> {1}".format((h,i,j),(_h,_i,_j))
                 self.hexmap[(_h,_i,_j)] = self.normalhexmap[(_h,_i,_j)]
             else:
                 print "Collided adding Hex {0} [{1}]".format((h,i,j),(_h,_i,_j))
@@ -232,6 +241,7 @@ class World:
             
     def update(self):
         for B in self.bees:
+            B.update()
             #Reveal the current hex
             h,i,j = B.pos
             _H = self.getHex(h, i, j)
