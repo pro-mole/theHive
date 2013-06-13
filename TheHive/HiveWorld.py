@@ -135,7 +135,7 @@ class World:
             B.setFunction("QUEEN")
             self.bees.append(B)
             self.entities.append(B)
-            for _p in [(1,0,0),(0,1,0),(0,0,-1)]:
+            for _p in [(1,0,0),(0,1,0),(0,0,1)]:
                 B = BEE(_p[0], _p[1], _p[2], self)
                 self.bees.append(B)
                 self.entities.append(B)
