@@ -4,6 +4,7 @@ Codifies BEEs, our main game agent'''
 has_pygame = True
 
 from HiveMath import *
+import random
 import operator
 try:
     import pygame
@@ -28,6 +29,9 @@ class BEE:
     hunger = 0
     '''Energy'''
     energy = 1000
+    
+    '''Home hive comb'''
+    home = None
 
     '''AI parameters'''
     '''Function: what does this BEE do?'''
@@ -38,9 +42,10 @@ class BEE:
     hexmap = None
 
     '''Create a BEE at position (H,I,J), associated with world W'''
-    def __init__(self,h,i,j,W):
+    def __init__(self,h,i,j,W,home):
         self.pos = (h,i,j)
         self.world = W
+        self.home = home
         self.hexmap = {}
         self.update()
     
@@ -66,8 +71,49 @@ class BEE:
         y = y*32 + 384
         
         pygame.draw.circle(surface, (255,192,128), (int(x),int(y)), 4)
+        pygame.draw.circle(surface, (0,0,0), (int(x),int(y)), 4, 1)
         
     def update(self):
+        #Act according to state
+        if self.state == "IDLE":
+            if self.function == "WORKER":
+                if random.random() < 0.1:
+                    self.state = "ROAM"
+        elif self.state == "ROAM":
+            explore = False
+            count = 10
+            while not explore and count > 0:
+                dir = random.choice(vectorhex1)
+                nextPos = tuple(map(operator.add,self.pos,dir))
+                explore = nextPos in self.hexmap.keys() and hexDist(nextPos,self.home) <= 12
+                if explore:
+                    self.pos = nextPos
+            self.energy -= 1
+            self.hunger += 1
+        elif self.state == "MARK":
+            delta = tuple(map(operator.sub,self.pos,self.home))
+            H = self.world.getHex(self.pos[0],self.pos[1],self.pos[2])
+            H.changeSmell("FlowerPath",1.0)
+            if delta[0] != 0:
+                signal = delta[0]/abs(delta[0])
+                self.pos = tuple(map(operator.add,self.pos,(signal,0,0)))
+            elif delta[1] != 0:
+                signal = delta[1]/abs(delta[1])
+                self.pos = tuple(map(operator.add,self.pos,(0,signal,0)))
+            elif delta[2] != 0:
+                signal = delta[2]/abs(delta[2])
+                self.pos = tuple(map(operator.add,self.pos,(0,0,signal)))
+            else:
+                self.state = IDLE
+        
+        #Act according to the current Hex
+        H = self.world.getHex(self.pos[0],self.pos[1],self.pos[2])
+        if H.terrain == 'Flower':
+            self.state = 'MARK' 
+        
+        #Metabolism
+        self.energy -= 1
+        
         #Reveal all hexes around yourself
         h,i,j = self.pos
         h,i,j = normalHex(h,i,j)

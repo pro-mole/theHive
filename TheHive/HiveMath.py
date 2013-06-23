@@ -9,6 +9,13 @@ import operator
 '''Unitary hex vectors'''
 vectorhex1 = [(0,0,1),(0,1,0),(1,0,0),(-1,0,0),(0,-1,0),(0,0,-1)]
 
+'''Hex Distance'''
+def hexDist(A,B):
+    delta = 0
+    for i in range(3):
+        delta += abs(A[i] - B[i])
+    return delta
+
 '''Get center XY coordinates for a Hex
 
 X,Y are normalized, i.e., are defined in term of tile width'''

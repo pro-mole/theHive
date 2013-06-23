@@ -131,12 +131,12 @@ class World:
                     for j in range(-initrange,initrange+1):
                         self.addHex(h,i,j)
             
-            B = BEE(0,0,0,self)
+            B = BEE(0,0,0,self,(0,0,0))
             B.setFunction("QUEEN")
             self.bees.append(B)
             self.entities.append(B)
             for _p in [(1,0,0),(0,1,0),(0,0,1)]:
-                B = BEE(_p[0], _p[1], _p[2], self)
+                B = BEE(_p[0], _p[1], _p[2], self, _p)
                 self.bees.append(B)
                 self.entities.append(B)
         
@@ -149,7 +149,7 @@ class World:
         R += "TheHive World Object\n"
         R += "Loaded hexes: {0}\n".format(len(self.normalhexmap))
         for H in self.normalhexmap:
-            R += "\t{0}\t{1}\n".format(H,self.hexmap[H])
+            R += "\t{0}\t{1}\n".format(H,self.normalhexmap[H])
         R += "\nBEEs: \n"
         for B in self.bees:
             R += "\t{0};\n".format(B)
@@ -172,9 +172,9 @@ class World:
     
     '''Add new hex in position H,I,J(taking in account randomizations)'''
     def addHex(self,h,i,j,**hexdata):
-        if not self.hexmap.has_key((h,i,j)):
+        if not (h,i,j) in self.normalhexmap.keys():
             _h,_i,_j = normalHex(h,i,j)
-            if not self.normalhexmap.has_key((_h,_i,_j)):
+            if not (_h,_i,_j) in self.normalhexmap.keys():
                 if getHexToXY(_h,_i,_j) == getHexToXY(-2,0,10):
                     print (h,i,j),(_h,_i,_j)
                     print getHexToXY(_h,_i,_j)
@@ -190,13 +190,13 @@ class World:
                         self.normalhexmap[(_h,_i,_j)].changeLiquid('Honey',int(random.random() * 20))
                         self.normalhexmap[(_h,_i,_j)].changePowder('Pollen',int(random.random() * 50))
                         self.normalhexmap[(_h,_i,_j)].changeSmell('Flower',1)
-#                         for d in range(1,5):
-#                             self.getHex(_h+d,_i,_j).changeSmell('Flower', math.pow(2,-d))
-#                             self.getHex(_h-d,_i,_j).changeSmell('Flower', math.pow(2,-d))
-#                             self.getHex(_h,_i+d,_j).changeSmell('Flower', math.pow(2,-d))
-#                             self.getHex(_h,_i-d,_j).changeSmell('Flower', math.pow(2,-d))
-#                             self.getHex(_h,_i,_j+d).changeSmell('Flower', math.pow(2,-d))
-#                             self.getHex(_h,_i,_j-d).changeSmell('Flower', math.pow(2,-d))
+                        for d in range(1,5):
+                            self.getHex(_h+d,_i,_j).changeSmell('Flower', math.pow(2,-d))
+                            self.getHex(_h-d,_i,_j).changeSmell('Flower', math.pow(2,-d))
+                            self.getHex(_h,_i+d,_j).changeSmell('Flower', math.pow(2,-d))
+                            self.getHex(_h,_i-d,_j).changeSmell('Flower', math.pow(2,-d))
+                            self.getHex(_h,_i,_j+d).changeSmell('Flower', math.pow(2,-d))
+                            self.getHex(_h,_i,_j-d).changeSmell('Flower', math.pow(2,-d))
                     #Everything else is just plain ol' dirt   
                     else:
                         self.normalhexmap[(_h,_i,_j)] = Hex('Dirt')
@@ -234,28 +234,20 @@ class World:
             pygame.draw.polygon(surface, C,
                 tuple(hexV))
             pygame.draw.polygon(surface, (0,0,0),
-                tuple(hexV), 1)
+                tuple(hexV), 2)
             
         for B in self.bees:
             B.draw(surface)
+            
+        m_x, m_y = pygame.mouse.get_pos()
+        m_x -= 512
+        m_y -= 384
+        m_h, m_i, m_j = getXYToHex(m_x, m_y)
+        M_H = (int(m_h), int(m_i), int(m_j))
+        if M_H in self.visiblehexmap.keys():
+            print M_H, self.normalhexmap[M_H]
             
     def update(self):
         for B in self.bees:
             B.update()
             #Reveal the current hex
-            h,i,j = B.pos
-            _H = self.getHex(h, i, j)
-            if B.function == "WORKER":
-                if B.state == "IDLE": 
-                    if B.energy >= 500 and random.random() < 0.2:
-                        B.state = "ROAM"
-                    else:
-                        B.energy += 3
-                elif B.state == "ROAM":
-                    if B.energy >= 100:
-                        B.pos = tuple(map(operator.add, B.pos, random.choice([(0,0,1),(0,0,-1),(0,1,0),(0,-1,0),(1,0,0),(-1,0,0)])))
-                        B.energy -= 1
-                    else:
-                        B.state = "IDLE"
-            B.energy -= 1
-            B.hunger += 1
