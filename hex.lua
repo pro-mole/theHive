@@ -48,12 +48,14 @@ end
 -- Norm, works just like vectors
 -- Norm 1 (default) defines the step distance
 function Hex:norm(n)
-	exp = n or 2
+	self:normalize()
+
+	exp = n or 1
 	if (exp == 1) then
-		return math.abs(self.i) + math.abs(self.j) + math.abs(self.k)
+		return math.abs(self.normalized.i) + math.abs(self.normalized.j) + math.abs(self.normalized.k)
 	end
 
-	return math.pow(math.pow(math.abs(self.i), exp) + math.pow(math.abs(self.j), exp) + math.pow(math.abs(self.k), exp), 1.0/exp)
+	return math.pow(math.pow(math.abs(self.normalized.i), exp) + math.pow(math.abs(self.normalized.j), exp) + math.pow(math.abs(self.normalized.k), exp), 1.0/exp)
 end
 
 -- Cartesian distance
@@ -116,4 +118,5 @@ Hex.K.XY = {x = -0.5, y = 1/3}
 assert(Hex.I + Hex.J == -Hex.K, "I + J != -K")
 assert(Hex.I + Hex.K == -Hex.J, "I + K != -J")
 assert(Hex.J + Hex.K == -Hex.I, "J + K != -I")
-assert(Hex.J + Hex.K + Hex.I == Hex.Zero, "J + K != 0")
+assert(Hex.J + Hex.K + Hex.I == Hex.Zero, "I + J + K != 0")
+assert((Hex.I + Hex.J + Hex.K):norm() == Hex.Zero:norm(), "|I + J + K| != 0")
