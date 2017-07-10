@@ -7,15 +7,32 @@ Hex = {
 	i = 0, j = 0, k = 0
 }
 
+HexMemory = {}
+
+-- Attempt to get existing hex, or create new one
+function  Hex.get(self, I, J, K)
+	H = HexMemory[{I,J,K}]
+
+	if H == nil then
+		H = Hex.new(I, J, K)
+	end
+
+	return H
+end
+
 -- Create hex vectors, of course
-function Hex.new(I, J, K) 
+function Hex.new(self, I, J, K) 
 	H = {
 		i = I or 0,
 		j = J or 0,
 		k = K or 0
 	}
 
-	return setmetatable(H, Hex.meta)
+	setmetatable(H, Hex.meta)
+
+	HexMemory[{I,J,K}] = H
+
+	return H
 end
 
 -- Normalize hex vector; very important operation
@@ -76,10 +93,16 @@ function Hex:toXY()
 
 	return self.XY
 end
+
+-- Return random seed for this Hex
+function Hex:random()
+	return seedForHex(self.i, self.j, self.k)
+end
 	
+setmetatable(Hex, { __call = Hex.get })
+
 Hex.meta = {
 	__index = Hex,
-	__call = Hex.new,
 
 	-- Arithmetic operations
 	__add = function(a, b)
@@ -99,8 +122,12 @@ Hex.meta = {
 	end,
 
 	-- Representation
+	__concat = function(s, r)
+		return string.format("%s%s", s, r)
+	end,
 	__tostring = function(self)
-		return "HEX(" .. self.i .. ";" .. self.j .. ";" .. self.k .. ")";
+		str = "HEX(" .. self.i .. ";" .. self.j .. ";" .. self.k .. ")"
+		return str
 	end
 }
 
